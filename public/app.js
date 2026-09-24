@@ -27,8 +27,30 @@ function renderChecks(results=[]){
 }
 function updateLines(){$('lines').textContent=Array.from({length:$('editor').value.split('\n').length},(_,index)=>index+1).join('\n');}
 function showLesson(){
- const lesson=COURSE[current];nav();$('eyebrow').textContent='';$('title').textContent=lesson.title;$('intro').textContent=lesson.intro;$('explanation').innerHTML=lesson.body;$('example').textContent=lesson.example;$('task').textContent=lesson.task;$('hint').textContent=lesson.hint;$('answer').textContent=lesson.answer;$('editor').value=saved.drafts[current]??lesson.starter;$('stdin').value=saved.inputs[current]??lesson.inputs;$('solution').open=false;
- $('badge').textContent=saved.passed[current]?'✓ Done':'';$('badge').className='badge'+(saved.passed[current]?' complete':'');$('output').textContent='Run your code to see the result.';$('feedback').textContent='Complete every check to finish this lesson.';$('feedback').className='';$('runtime').textContent='';$('position').textContent=`${current+1} / ${COURSE.length}`;$('prev').disabled=current===0;$('next').disabled=current===COURSE.length-1;updateLines();renderChecks();
+ const lesson=COURSE[current];nav();$('eyebrow').textContent='';$('title').textContent=lesson.title;$('intro').textContent=lesson.intro;$('explanation').innerHTML=lesson.body;$('example').textContent=lesson.example;$('walkthrough').textContent=lesson.walkthrough;$('task').textContent=lesson.task;$('hint').textContent=lesson.hint;$('answer').textContent=lesson.answer;$('editor').value=saved.drafts[current]??lesson.starter;$('stdin').value=saved.inputs[current]??lesson.inputs;$('solution').open=false;
+ setupLessonMode(lesson);
+ $('badge').textContent=saved.passed[current]?'✓ Done':'';$('badge').className='badge'+(saved.passed[current]?' complete':'');$('output').textContent='Run your code to see the result.';$('feedback').textContent='';$('feedback').className='';$('runtime').textContent='';$('position').textContent=`${current+1} / ${COURSE.length}`;$('prev').disabled=current===0;$('next').disabled=current===COURSE.length-1;updateLines();renderChecks();
+}
+function setupLessonMode(lesson){
+ const reading=lesson.kind==='question';
+ $('readingCheck').hidden=!reading;$('codingChallenge').hidden=reading;$('practicePanel').hidden=reading;
+ document.querySelector('.workspace').classList.toggle('reading-only',reading);
+ $('tryExample').hidden=reading||lesson.exampleRunnable===false;
+ $('inputBox').hidden=!lesson.inputs;$('inputBox').open=Boolean(lesson.inputs);
+ $('readingFeedback').textContent='';$('readingFeedback').className='';
+ if(!reading)return;
+ $('readingQuestion').textContent=lesson.task;
+ $('readingOptions').innerHTML=lesson.options.map((option,index)=>`<button class="reading-option" data-option="${index}">${esc(option)}</button>`).join('');
+ if(saved.passed[current]){$('readingFeedback').textContent='✓ Correct';$('readingFeedback').className='success';}
+ $('readingOptions').querySelectorAll('button').forEach(button=>button.onclick=()=>{
+   const correct=Number(button.dataset.option)===lesson.correct;
+   $('readingOptions').querySelectorAll('button').forEach(b=>b.classList.remove('correct','incorrect'));
+   button.classList.add(correct?'correct':'incorrect');
+   $('readingFeedback').textContent=correct?'✓ Correct':'Try again. Re-read the explanation above.';
+   $('readingFeedback').className=correct?'success':'';
+   if(correct)saved.passed[current]=true;else delete saved.passed[current];
+   persist();nav();$('badge').textContent=correct?'✓ Done':'';$('badge').className='badge'+(correct?' complete':'');
+ });
 }
 function stop(message){if(worker)worker.terminate();worker=null;clearTimeout(timer);busy=false;$('run').disabled=false;$('check').disabled=false;$('stop').hidden=true;$('runtime').textContent='';if(message!==undefined)$('output').textContent=message;}
 function select(id){if(!Number.isInteger(id)||!COURSE[id])return;saveDraft();stop();current=id;persist();showLesson();$('sidebar').classList.remove('open');$('menu').setAttribute('aria-expanded','false');window.scrollTo({top:0,behavior:'smooth'});}
@@ -60,6 +82,7 @@ function openProfiles(){
   $('profileDialog').showModal();
 }
 function renderProfiles(){
+  $('legacyNotice').hidden=!profileStore.current().previousCourse;
   $('profileList').innerHTML=profileStore.list().map(p=>`<button type="button" class="profile-choice ${p.id===profileStore.activeId?'selected':''}" data-profile="${esc(p.id)}">${esc(p.name)}${p.id===profileStore.activeId?' <span>Current</span>':''}</button>`).join('');
   $('profileList').querySelectorAll('[data-profile]').forEach(button=>button.onclick=()=>{
     saveDraft();persist();stop();saved=profileStore.switchTo(button.dataset.profile);current=saved.last;
@@ -99,5 +122,11 @@ $('backupFile').onchange=async event=>{
 };
 $('stdin').addEventListener('input',()=>{saved.inputs[current]=$('stdin').value;persist();});
 window.addEventListener('pagehide',()=>{saveDraft();persist();});
+const reference=[
+ ['print(value)','Display a value.'],['input(prompt)','Read one reply as text.'],['len(collection)','Count items or characters.'],['type(value)','Inspect the type of a value.'],['range(start, stop)','Generate integer steps; stop is excluded.'],['int(value)','Convert to an integer.'],['float(value)','Convert to a decimal number.'],['str(value)','Convert to text.'],['bool(value)','Convert to True or False.'],['sum(numbers)','Add numeric items.'],['min(values)','Return the smallest item; needs nonempty input here.'],['max(values)','Return the largest item; needs nonempty input here.'],['sorted(values)','Return a new sorted list.'],['enumerate(items)','Provide index-item pairs.'],['zip(a, b)','Pair items; stop at the shorter input.']
+];
+$('referenceContent').innerHTML=reference.map(([name,description])=>`<p><code>${esc(name)}</code><br>${esc(description)}</p>`).join('');
+$('referenceButton').onclick=()=>$('referenceDialog').showModal();
+$('closeReference').onclick=()=>$('referenceDialog').close();
 showLesson();saveStatus();
 if(document.modelContext?.registerTool){try{const controller=new AbortController();document.modelContext.registerTool({name:'open_python_lesson',title:'Open Python lesson',description:'Open one lesson by number and save the current draft.',inputSchema:{type:'object',properties:{lessonId:{type:'integer',minimum:0,maximum:COURSE.length-1}},required:['lessonId'],additionalProperties:false},annotations:{readOnlyHint:false},execute:({lessonId})=>{select(lessonId);return{lessonId:current,title:COURSE[current].title};}},{signal:controller.signal});window.addEventListener('pagehide',()=>controller.abort(),{once:true});}catch{}}

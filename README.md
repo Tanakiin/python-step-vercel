@@ -1,58 +1,55 @@
-# Python lessons — no database
+# Python lessons — small steps edition
 
-A static, dark-mode Python course with 34 lessons and projects, an editable Python playground, and 128 exercise checks. No database, account service, API keys, or environment variables are needed.
+A static, database-free Python course for complete beginners. Dark interface, 194 short steps, a browser Python editor, 373 coding checks, and five reading checks. No account or API key setup.
 
-## Update your existing Vercel site
+## Update your Vercel site
 
-1. Extract this ZIP. Copy the contents of `python-step-vercel` into your existing Git repository folder. Replace matching files. Keep your existing `.git` folder.
-2. If you previously copied the database edition, delete its obsolete `public/config.js`, `supabase/` folder, and `README.old.md`. This edition does not reference those files.
-3. Commit and push:
+1. Extract the ZIP. Copy the contents of `python-step-vercel` into your existing repository, replacing the matching files. Keep your existing `.git` folder.
+2. If files remain from the older Supabase edition, remove `public/config.js`, the `supabase` folder, and `README.old.md`. They are not used.
+3. Commit and push to your connected repository:
 
-   ```sh
-   git add .
-   git commit -m "Use browser profiles without a database"
-   git push
-   ```
+```sh
+git add .
+git commit -m "Rewrite Python course into small learning steps"
+git push
+```
 
-4. Vercel deploys the connected repository. The included configuration uses the Other framework preset, the public output directory, and no install or build step.
+The included vercel.json serves `public` directly. No install or build command is required. Your connected Vercel project redeploys after the push.
 
-For a new project, upload this folder's contents to a GitHub repository and import it into Vercel. Share the public production domain after deployment.
+## Learn at your own pace
 
-## Save progress
+Each step introduces one focused idea, explains an example, and asks for one small change or a short exercise. Projects are divided into stages throughout the course. Next never runs automatically. Lessons remain freely accessible for review.
 
-- The profile button is in the top right. Open it and add a name for each learner.
-- Switching profiles restores that learner's code, program inputs, completed lessons, and current lesson.
-- Changes save automatically in the current browser. Reopening the same site restores the last active profile.
-- Profiles are local conveniences, not password-protected accounts. Anyone using this browser can select a profile.
-- Other browsers, devices, and domains have separate saves. To move progress, choose **Export backup** on the old device and **Import backup** on the new one.
-- Import creates another profile and never replaces an existing one. Repeated names receive a number.
-- Clearing site data or leaving a private browsing session can remove local saves. Keep an exported backup if you want a lasting copy.
-- If browser storage is blocked or full, the page displays a warning. Export a backup before closing.
-- Earlier guest saves on the same domain are migrated to the initial Learner profile when available. This package does not access any former cloud account data.
+Run explores the code. Check evaluates the exercise requirements, including alternative values and boundaries where appropriate. Green checks and Done mark success. Editing code clears that lesson’s completion until it passes again. Hints and solutions remain collapsed until opened. Program input appears only for steps that need it. Examples that are explanatory fragments have no Use example button.
+
+The built-in function reference is available from the sidebar. COURSE-OUTLINE.md lists all steps in their learning order.
+
+## Profiles and existing progress
+
+Profiles save code, inputs, completion, and the current step in localStorage in the same browser on the same site address. They are local profiles, not password-protected accounts. Anyone using that browser can switch profiles. Different devices, browsers, or site addresses have separate saves.
+
+This edition has a different course structure. On the same site, names from the earlier 34-lesson database-free edition are carried forward. Their old work is archived in each profile and included in its exported backup. New steps start fresh; old lesson numbers are never treated as completion of unrelated new steps. The earlier browser save is also left intact.
+
+New backup exports use version 2 and include the curriculum identifier. Importing a version 1 backup creates a separate profile with its old work archived and the new course unstarted. Importing a version 2 backup restores the new course progress. Imports do not overwrite another profile.
+
+Export a backup from Profiles before clearing browser data or moving devices. Private browsing may discard local saves when closed. Automatic cross-device sync is not provided.
 
 ## Run locally
 
-Serve the public folder over HTTP; opening index.html directly as a file is not supported by the Python worker.
+From the project directory:
 
 ```sh
 python -m http.server 8000 --directory public
 ```
 
-On Windows, use `py` in place of `python` if needed. Open http://localhost:8000.
+Open http://localhost:8000. Use an HTTP server rather than opening index.html directly.
 
-## Python execution
+## Python runtime and practice files
 
-Pyodide 0.27.7 loads from jsDelivr and runs Python in a separate browser worker. Internet is needed to load the engine. Each run starts fresh; playground files are temporary. Stop terminates a running program; execution also stops automatically after five seconds.
+Pyodide loads from the jsDelivr CDN; an internet connection is needed. Python runs in a dedicated worker, with Stop and a five-second execution timeout. An endless loop can be stopped without reloading the course. Output is limited.
 
-## Files
-
-- public/index.html and public/style.css — interface
-- public/course.js — lessons, examples, exercises, answers, and checks
-- public/app.js — editor, navigation, and profile controls
-- public/profiles.js — local saving and JSON backup handling
-- public/worker.js and public/runner.py — Python engine integration
-- vercel.json — static hosting configuration
+File exercises use the worker’s temporary virtual filesystem. It resets on each Run or Check. Your computer’s files are not edited. The site saves code drafts and course progress, not files created inside Python.
 
 ## Validation
 
-The 128 exercise checks and worked answers retain the previously verified Python engine behavior. This edition was checked for profile isolation, restoration, input and lesson saving, backup round trips, invalid imports, duplicate names, simultaneous profiles in separate tabs, storage failures, legacy guest migration, JavaScript syntax, and local asset references. A full browser visual check was unavailable in the build environment.
+All 189 coding lesson solutions passed all 373 checks using the included runner under CPython. No unfinished starter passed all of its checks. Five reading checks were structurally validated. Profile migration, old-save preservation, isolation, reload, inputs, completion, backup imports/exports, multiple profile tabs, and unavailable-storage behaviour passed local tests. JavaScript syntax, HTML IDs, asset references, and ZIP integrity were checked. A live browser/Pyodide visual run was not performed for this rewrite.

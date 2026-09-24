@@ -17,24 +17,25 @@
   </header>
   <div class="layout">
     <aside id="sidebar" class="sidebar" aria-label="Course contents">
-      <div class="course-progress"><span id="progressText">0 / 34</span><progress id="progress" value="0" max="100" aria-label="Completed lessons"></progress></div>
-      <nav id="nav" aria-label="Lessons"></nav>
+      <div class="course-progress"><span id="progressText">0 / 194</span><progress id="progress" value="0" max="100" aria-label="Completed lessons"></progress></div>
+      <nav id="nav" aria-label="Lessons"></nav><button id="referenceButton" class="text-button">Built-in reference</button>
     </aside>
     <main>
       <div class="lesson-head"><div><p id="eyebrow" class="eyebrow"></p><h1 id="title"></h1><p id="intro" class="intro"></p></div><span id="badge" class="badge"></span></div>
       <div class="workspace">
         <section class="lesson-content">
           <div id="explanation" class="explanation"></div>
-          <section class="example"><div class="section-heading"><h2>Example</h2><button id="tryExample" class="text-button">Use example</button></div><pre id="example"></pre></section>
-          <section class="challenge"><h2 id="taskTitle">Exercise</h2><p id="task"></p>
+          <section class="example"><div class="section-heading"><h2>Example</h2><button id="tryExample" class="text-button">Use example</button></div><pre id="example"></pre><p id="walkthrough" class="walkthrough"></p></section>
+          <section class="challenge" id="codingChallenge"><h2 id="taskTitle">Exercise</h2><p id="task"></p>
             <details><summary>Hint</summary><p id="hint"></p></details>
             <details id="solution"><summary>Show solution</summary><pre id="answer"></pre><button id="loadAnswer" class="text-button">Use solution</button></details>
           </section>
+          <section id="readingCheck" hidden><h2>Quick check</h2><p id="readingQuestion"></p><div id="readingOptions"></div><p id="readingFeedback" role="status"></p></section>
         </section>
-        <section class="practice" aria-label="Python editor">
+        <section id="practicePanel" class="practice" aria-label="Python editor">
           <div class="editor-head"><span>practice.py</span><button id="reset" class="text-button">Reset</button></div>
           <div class="editor-wrap"><pre id="lines" aria-hidden="true">1</pre><textarea id="editor" aria-label="Python code" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea></div>
-          <details class="input-box"><summary>Program input</summary><label for="stdin">Enter one response per line.</label><textarea id="stdin" rows="2"></textarea></details>
+          <details id="inputBox" class="input-box" hidden><summary>Program input</summary><label for="stdin">Enter one response per line.</label><textarea id="stdin" rows="2"></textarea></details>
           <div class="runbar"><button id="run" class="secondary">Run</button><button id="check" class="primary">Check</button><button id="stop" class="stop-button" hidden>Stop</button></div>
           <section class="results"><div class="output-panel"><div class="result-heading">Output <span id="runtime"></span></div><pre id="output" aria-live="polite">Run your code to see the result.</pre></div>
             <div class="check-panel"><div class="result-heading">Checks <span id="checkCount"></span></div><div id="tests" aria-live="polite"></div><p id="feedback" aria-live="polite">Complete every check to finish this lesson.</p></div>
@@ -48,7 +49,7 @@
     <div class="profile-dialog-body">
       <button id="closeProfiles" class="dialog-close" aria-label="Close profiles" type="button">×</button>
       <h2 id="profileTitle">Profiles</h2>
-      <p class="dialog-copy">Saved in this browser. Use a backup to move devices.</p>
+      <p class="dialog-copy">Saved in this browser. Use a backup to move devices.</p><p id="legacyNotice" class="dialog-copy" hidden>Earlier-course work is preserved in your backup. These new lessons start fresh.</p>
       <div id="profileList" class="profile-list"></div>
       <form id="profileForm" class="profile-create">
         <label for="profileName">New profile</label>
@@ -58,6 +59,9 @@
       <input id="backupFile" type="file" accept=".json,application/json" hidden>
       <p id="profileMessage" class="account-message" role="status"></p>
     </div>
+  </dialog>
+  <dialog id="referenceDialog" class="account-dialog" aria-labelledby="referenceTitle">
+    <div class="profile-dialog-body"><button id="closeReference" class="dialog-close" aria-label="Close reference">×</button><h2 id="referenceTitle">Built-in reference</h2><div id="referenceContent"></div></div>
   </dialog>
   <script src="course.js"></script>
   <script src="profiles.js"></script>

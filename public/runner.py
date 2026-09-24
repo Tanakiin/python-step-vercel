@@ -53,6 +53,26 @@ def execute_lesson(payload):
         a, b = cls('Ada'), cls('Lin')
         a.add_grade(100)
         return b.grades == [] and b.average() == 0
+    def calls(name):
+        return any(isinstance(node, ast.Call) and ast.unparse(node.func) == name for node in ast.walk(ast.parse(source)))
+    def raises_error(fn, value, expected):
+        try:
+            fn(value)
+        except expected:
+            return True
+        return False
+    def read_text(path):
+        with open(path, encoding='utf-8') as handle:
+            return handle.read()
+    def grades_added(cls):
+        student = cls('Ada')
+        student.add_grade(80)
+        student.add_grade(100)
+        return student.grades == [80,100]
+    def grades_separate(cls):
+        a,b = cls('Ada'),cls('Lin')
+        a.add_grade(80)
+        return a.grades == [80] and b.grades == []
     try:
         with contextlib.redirect_stdout(captured), contextlib.redirect_stderr(captured):
             exec(compile(source, 'practice.py', 'exec'), namespace)
@@ -60,6 +80,7 @@ def execute_lesson(payload):
         return json.dumps({'output': captured.getvalue(), 'error': traceback.format_exc(), 'results': []})
     checks = dict(namespace)
     checks.update(output=captured.getvalue(),source=source,user_globals=namespace,rerun=rerun,has_node=has_node,counter_repeats=counter_repeats,counter_independent=counter_independent,todo_preserves=todo_preserves,student_average=student_average,student_independent=student_independent)
+    checks.update(calls=calls,raises_error=raises_error,read_text=read_text,grades_added=grades_added,grades_separate=grades_separate)
     results=[]
     for test in payload.get('tests', []):
         try:
